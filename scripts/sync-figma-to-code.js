@@ -4,7 +4,7 @@ const fs = require('fs');
 async function syncComponent(fileKey, componentName) {
   // 1. Fetch file data from Figma
   const response = await axios.get(`https://api.github.com/v1/files/${fileKey}`, {
-    headers: { 'X-Figma-Token': process.env.FIGMA_TOKEN }
+    headers: { 'X-Figma-Token': process.env.FIGMA_ACCESS_TOKEN }
   });
 
   // 2. Find the Component Set (the container for variants)
