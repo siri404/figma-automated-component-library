@@ -1,0 +1,51 @@
+name: Figma Design Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      component_name:
+        description: 'Component to sync'
+        required: true
+      figma_file_key:
+        description: 'Figma File Key'
+        required: true
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Sync Figma Component
+        env:
+          FIGMA_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+        run: |
+          node ./scripts/sync-figma-to-code.js \
+          --fileKey "${{ github.event.inputs.figma_file_key }}" \
+          --component "${{ github.event.inputs.component_name }}"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat(design-system): sync ${{ github.event.inputs.component_name }} from Figma"
+          branch: figma-sync/${{ github.event.inputs.component_name }}
+          title: "🎨 Design Sync: ${{ github.event.inputs.component_name }}"
+          body: |
+            This PR was automatically generated from Figma.
+            - **Component:** ${{ github.event.inputs.component_name }}
+            - **Figma File:** [View File](https://www.figma.com/file/${{ github.event.inputs.figma_file_key }})
+            
+            Please verify the generated props and styles.
+          labels: |
+            design-sync
+            automated-pr
