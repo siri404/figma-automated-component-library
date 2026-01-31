@@ -12,7 +12,7 @@ async function syncComponent() {
 
     // 1. Correct Figma API URL
     const response = await axios.get(`https://api.figma.com/v1/files/${fileKey}`, {
-      headers: { 'X-Figma-Token': process.env.FIGMA_TOKEN }
+      headers: { 'X-Figma-Token': (process.env.FIGMA_TOKEN || '').trim() }
     });
 
     // 2. Find the Component Set
